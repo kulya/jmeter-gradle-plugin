@@ -1,0 +1,57 @@
+//import org.apache.maven.model.Scm;
+
+apply plugin: 'maven'
+
+
+task sourceJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.java
+}
+
+artifacts {
+	archives sourceJar
+}
+
+
+uploadArchives {
+	repositories.mavenDeployer { deployer ->
+		def credentials = [userName: project.properties.veilMvnDeployerUser, password: project.properties.veilMvnDeployerPass]
+		
+		repository(url: "http://veil.org.ua/nexus/content/repositories/local-release/") {
+			authentication(credentials)
+		}
+		
+		snapshotRepository(url: "http://veil.org.ua/nexus/content/repositories/local-snapshot/") {
+			authentication(credentials)
+		}
+		
+		customizePom(deployer.pom)
+	}
+}
+
+def customizePom(pom) {
+	pom.whenConfigured { p ->
+		p.dependencies.findAll { dep -> dep.scope != 'test'}*.scope = 'runtime'
+	}
+	
+	pom.project {
+		licenses {
+			license {
+				name 'The Apache Software License, Version 2.0'
+				url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+				distribution 'repo'
+			}
+		}
+	}
+	
+	setUpScm(pom)
+}
+
+def setUpScm(pom) {
+//	Scm scm = new Scm()
+//	scm.connection = "scm:git:https://github.com/kulya/jetty7-gradle-plugin.git"
+//	scm.developerConnection = "scm:git:https://github.com/kulya/jetty7-gradle-plugin.git"
+//	scm.url = "scm:git:https://github.com/kulya/jetty7-gradle-plugin.git"
+//	scm.tag = "master"
+//	pom.model.scm = scm
+}
