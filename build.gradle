@@ -5,12 +5,31 @@ apply from: "$rootDir/gradle/maven-deployment.gradle"
 group = 'org.veil.gradle.plugins'
 projectName = 'jmeter-gradle-plugin'
 version = '1.0-SNAPSHOT'
+
+jmeterVersion = "2.5.3"
+
+sourceCompatibility=1.6
+targetCompatibility=1.6
+
 repositories {
 	mavenRepo urls: "http://veil.org.ua/nexus/content/groups/public/"
 }
 
 dependencies {
-	compile gradleApi() 
+	compile gradleApi(),
+        "org.apache.jmeter:jmeter-http:${jmeterVersion}",
+		"org.apache.jmeter:jmeter-junit:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-java:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-report:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-jdbc:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-tcp:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-mail:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-ldap:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-ftp:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-functions:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-monitor-components:${jmeterVersion}",
+        "org.apache.jmeter:jmeter-jms:${jmeterVersion}"
+
 	
 	groovy localGroovy()
 	
