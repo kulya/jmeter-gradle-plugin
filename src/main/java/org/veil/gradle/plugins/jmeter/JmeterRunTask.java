@@ -4,15 +4,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jmeter.JMeter;
 import org.apache.tools.ant.DirectoryScanner;
 import org.gradle.api.GradleException;
-import org.gradle.api.Project;
 import org.gradle.api.internal.ConventionTask;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.TaskExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.security.Permission;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -101,6 +101,8 @@ public class JmeterRunTask extends ConventionTask {
      */
     private File reportXslt;
 
+    private List<String> jmeterUserProperties;
+
     private File workDir;
     private File jmeterLog;
     private DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
@@ -117,7 +119,11 @@ public class JmeterRunTask extends ConventionTask {
 
         List<String> testFiles = new ArrayList<String>();
         if (jmeterTestFile != null) {
-            testFiles.add(jmeterTestFile.getCanonicalPath());
+            if (jmeterTestFile.exists() && jmeterTestFile.isFile()) {
+                testFiles.add(jmeterTestFile.getCanonicalPath());
+            } else {
+                throw new GradleException("Test file " + jmeterTestFile.getCanonicalPath() + " does not exists");
+            }
         } else {
             testFiles.addAll(scanSourceFolder());
         }
@@ -146,6 +152,7 @@ public class JmeterRunTask extends ConventionTask {
         reportXslt = getReportXslt();
         includes = getIncludes();
         excludes = getExcludes();
+        jmeterUserProperties = getJmeterUserProperties();
     }
 
      private void checkForErrors(List<String> results) {
@@ -208,11 +215,14 @@ public class JmeterRunTask extends ConventionTask {
             File testFile = new File(fileLocation);
             File resultFile = new File(reportDir, testFile.getName() + "-" + fmt.format(new Date()) + ".xml");
             resultFile.delete();
-            List<String> args = Arrays.asList("-n",
-                    "-t", testFile.getCanonicalPath(),
-                    "-l", resultFile.getCanonicalPath(),
-                    "-d", getProject().getRootDir().getCanonicalPath(),
-                    "-p", srcDir + File.separator + JMETER_DEFAULT_PROPERTY_NAME);
+            List<String> args = new ArrayList<String>();
+             args.addAll(Arrays.asList("-n",
+                     "-t", testFile.getCanonicalPath(),
+                     "-l", resultFile.getCanonicalPath(),
+                     "-d", getProject().getRootDir().getCanonicalPath(),
+                     "-p", srcDir + File.separator + JMETER_DEFAULT_PROPERTY_NAME));
+
+            initUserProperties(args);
 
             if (remote) {
                 args.add("-r");
@@ -247,7 +257,8 @@ public class JmeterRunTask extends ConventionTask {
             });
 
             try {
-                new JMeter().start(args.toArray(new String[]{}));
+                JMeter jmeter = new JMeter();
+                jmeter.start(args.toArray(new String[]{}));
                 BufferedReader in = new BufferedReader(new FileReader(jmeterLog));
                 while (!checkForEndOfTest(in)) {
                     try {
@@ -272,12 +283,24 @@ public class JmeterRunTask extends ConventionTask {
         }
     }
 
+    private void initUserProperties(List<String> jmeterArgs) {
+        if (jmeterUserProperties != null) {
+            for (Object property : jmeterUserProperties.toArray(new Object []{})) {
+                jmeterArgs.add("-J");
+                jmeterArgs.add(String.valueOf(property));
+            }
+        }
+    }
+
     private boolean checkForEndOfTest(BufferedReader in) {
         boolean testEnded = false;
         try {
             String line;
             while ((line = in.readLine()) != null) {
                 if (line.contains("Test has ended")) {
+                    testEnded = true;
+                    break;
+                } else if (line.contains("Could not open")) {
                     testEnded = true;
                     break;
                 }
@@ -315,6 +338,18 @@ public class JmeterRunTask extends ConventionTask {
             throw new GradleException("Can't get canonical path for log file", e);
         }
         initTempProperties();
+        resolveJmeterSearchPath();
+    }
+
+    private void resolveJmeterSearchPath() {
+        String cp = "";
+        URL[] classPath = ((URLClassLoader)this.getClass().getClassLoader()).getURLs();
+        for (URL dep : classPath) {
+            if (dep.getPath().matches("^.*org[.]apache[.]jmeter[/]jmeter-.*2[.]5[.]3[.]jar$")) {
+                cp += dep.getPath() + ";";
+            }
+        }
+        System.setProperty("search_paths", cp);
     }
 
     private void initTempProperties() throws IOException {
@@ -431,27 +466,11 @@ public class JmeterRunTask extends ConventionTask {
         this.reportXslt = reportXslt;
     }
 
-    public File getWorkDir() {
-        return workDir;
+    public List<String> getJmeterUserProperties() {
+        return jmeterUserProperties;
     }
 
-    public void setWorkDir(File workDir) {
-        this.workDir = workDir;
-    }
-
-    public File getJmeterLog() {
-        return jmeterLog;
-    }
-
-    public void setJmeterLog(File jmeterLog) {
-        this.jmeterLog = jmeterLog;
-    }
-
-    public DateFormat getFmt() {
-        return fmt;
-    }
-
-    public void setFmt(DateFormat fmt) {
-        this.fmt = fmt;
+    public void setJmeterUserProperties(List<String> jmeterUserProperties) {
+        this.jmeterUserProperties = jmeterUserProperties;
     }
 }

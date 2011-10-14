@@ -93,5 +93,11 @@ public class JmeterPlugin implements Plugin<Project>{
                  return jmeterConvention.getReportXslt();
              }
          });
+
+        jmeterRunTask.getConventionMapping().map("jmeterUserProperties", new ConventionValue() {
+            public Object getValue(Convention convention, IConventionAware iConventionAware) {
+                return jmeterConvention.getJmeterUserProperties();
+            }
+        });
     }
 }
