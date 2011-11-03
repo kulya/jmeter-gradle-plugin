@@ -8,11 +8,11 @@ import java.util.List;
 public class JmeterPluginConvention {
 
     /**
-     * Path to a Jmeter test XML file.
+     * Path to a Jmeter tests XML file.
      * Relative to srcDir.
      * May be declared instead of the parameter includes.
      */
-    private File jmeterTestFile;
+    private List<File> jmeterTestFiles;
 
     /**
      * Directory under which JMeter test XML files are stored.
@@ -90,12 +90,12 @@ public class JmeterPluginConvention {
         srcDir = new File(project.getRootDir(), "src/test/jmeter");
     }
 
-    public File getJmeterTestFile() {
-        return jmeterTestFile;
+    public List<File> getJmeterTestFiles() {
+        return jmeterTestFiles;
     }
 
-    public void setJmeterTestFile(File jmeterTestFile) {
-        this.jmeterTestFile = jmeterTestFile;
+    public void setJmeterTestFile(List<File> jmeterTestFiles) {
+        this.jmeterTestFiles = jmeterTestFiles;
     }
 
     public File getSrcDir() {

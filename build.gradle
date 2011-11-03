@@ -28,7 +28,8 @@ dependencies {
         "org.apache.jmeter:jmeter-ftp:${jmeterVersion}",
         "org.apache.jmeter:jmeter-functions:${jmeterVersion}",
         "org.apache.jmeter:jmeter-monitor-components:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-jms:${jmeterVersion}"
+        "org.apache.jmeter:jmeter-jms:${jmeterVersion}",
+        "org.beanshell:bsh-core:2.0b4"
 
 	
 	groovy localGroovy()

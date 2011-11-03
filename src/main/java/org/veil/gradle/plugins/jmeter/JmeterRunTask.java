@@ -30,7 +30,7 @@ public class JmeterRunTask extends ConventionTask {
      * Relative to srcDir.
      * May be declared instead of the parameter includes.
      */
-    private File jmeterTestFile;
+    private List<File> jmeterTestFiles;
 
     /**
      * Directory under which JMeter test XML files are stored.
@@ -118,11 +118,13 @@ public class JmeterRunTask extends ConventionTask {
         initJmeterSystemProperties();
 
         List<String> testFiles = new ArrayList<String>();
-        if (jmeterTestFile != null) {
-            if (jmeterTestFile.exists() && jmeterTestFile.isFile()) {
-                testFiles.add(jmeterTestFile.getCanonicalPath());
-            } else {
-                throw new GradleException("Test file " + jmeterTestFile.getCanonicalPath() + " does not exists");
+        if (jmeterTestFiles != null) {
+            for (File f : jmeterTestFiles) {
+                if (f.exists() && f.isFile()) {
+                    testFiles.add(f.getCanonicalPath());
+                } else {
+                    throw new GradleException("Test file " + f.getCanonicalPath() + " does not exists");
+                }
             }
         } else {
             testFiles.addAll(scanSourceFolder());
@@ -143,7 +145,7 @@ public class JmeterRunTask extends ConventionTask {
     private void loadPropertiesFromConvention() {
         jmeterIgnoreError = getJmeterIgnoreError();
         jmeterIgnoreFailure = getJmeterIgnoreFailure();
-        jmeterTestFile = getJmeterTestFile();
+        jmeterTestFiles = getJmeterTestFiles();
         srcDir = getSrcDir();
         reportDir = getReportDir();
         remote = getRemote();
@@ -347,6 +349,8 @@ public class JmeterRunTask extends ConventionTask {
         for (URL dep : classPath) {
             if (dep.getPath().matches("^.*org[.]apache[.]jmeter[/]jmeter-.*2[.]5[.]3[.]jar$")) {
                 cp += dep.getPath() + ";";
+            } else if (dep.getPath().matches("^.*bsh.*[.]jar$")) {
+                cp += dep.getPath() + ";";
             }
         }
         System.setProperty("search_paths", cp);
@@ -378,12 +382,12 @@ public class JmeterRunTask extends ConventionTask {
         }
     }
 
-    public File getJmeterTestFile() {
-        return jmeterTestFile;
+    public List<File> getJmeterTestFiles() {
+        return jmeterTestFiles;
     }
 
-    public void setJmeterTestFile(File jmeterTestFile) {
-        this.jmeterTestFile = jmeterTestFile;
+    public void setJmeterTestFiles(List<File> jmeterTestFiles) {
+        this.jmeterTestFiles = jmeterTestFiles;
     }
 
     public File getSrcDir() {

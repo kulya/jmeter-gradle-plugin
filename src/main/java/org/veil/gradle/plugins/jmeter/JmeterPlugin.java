@@ -28,9 +28,9 @@ public class JmeterPlugin implements Plugin<Project>{
     }
 
     private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunTask jmeterRunTask) {
-         jmeterRunTask.getConventionMapping().map("jmeterTestFile", new ConventionValue() {
+         jmeterRunTask.getConventionMapping().map("jmeterTestFiles", new ConventionValue() {
              public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getJmeterTestFile();
+                 return jmeterConvention.getJmeterTestFiles();
              }
          });
 
