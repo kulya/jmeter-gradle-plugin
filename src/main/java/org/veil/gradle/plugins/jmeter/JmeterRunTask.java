@@ -221,7 +221,7 @@ public class JmeterRunTask extends ConventionTask {
              args.addAll(Arrays.asList("-n",
                      "-t", testFile.getCanonicalPath(),
                      "-l", resultFile.getCanonicalPath(),
-                     "-d", getProject().getRootDir().getCanonicalPath(),
+                     "-d", getProject().getProjectDir().getCanonicalPath(),
                      "-p", srcDir + File.separator + JMETER_DEFAULT_PROPERTY_NAME));
 
             initUserProperties(args);
