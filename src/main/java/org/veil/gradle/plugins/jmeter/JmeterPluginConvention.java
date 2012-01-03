@@ -87,7 +87,7 @@ public class JmeterPluginConvention {
 
     public JmeterPluginConvention(Project project) {
         reportDir = new File(project.getBuildDir(), "jmeter-report");
-        srcDir = new File(project.getRootDir(), "src/test/jmeter");
+        srcDir = new File(project.getProjectDir(), "src/test/jmeter");
     }
 
     public List<File> getJmeterTestFiles() {
