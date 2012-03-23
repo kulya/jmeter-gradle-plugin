@@ -15,13 +15,13 @@ artifacts {
 
 uploadArchives {
 	repositories.mavenDeployer { deployer ->
-		def credentials = [userName: project.properties.veilMvnDeployerUser, password: project.properties.veilMvnDeployerPass]
+		def credentials = [userName: project.properties.kulyaMvnDeployerUser, password: project.properties.kulyaMvnDeployerPass]
 		
-		repository(url: "http://veil.org.ua/nexus/content/repositories/local-release/") {
+		repository(url: "http://repo.kulya.info/content/repositories/releases/") {
 			authentication(credentials)
 		}
 		
-		snapshotRepository(url: "http://veil.org.ua/nexus/content/repositories/local-snapshot/") {
+		snapshotRepository(url: "http://repo.kulya.info/content/repositories/snapshots/") {
 			authentication(credentials)
 		}
 		
