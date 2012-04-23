@@ -3,11 +3,11 @@ package org.veil.gradle.plugins.jmeter;
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.internal.IConventionAware;
 import org.gradle.api.plugins.Convention;
-import org.gradle.api.tasks.ConventionValue;
 
-public class JmeterPlugin implements Plugin<Project>{
+import java.util.concurrent.Callable;
+
+public class JmeterPlugin implements Plugin<Project> {
 
     public static final String JMETER_RUN = "jmeterRun";
 
@@ -28,74 +28,74 @@ public class JmeterPlugin implements Plugin<Project>{
     }
 
     private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunTask jmeterRunTask) {
-         jmeterRunTask.getConventionMapping().map("jmeterTestFiles", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getJmeterTestFiles();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("jmeterTestFiles", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getJmeterTestFiles();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("srcDir", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getSrcDir();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("srcDir", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getSrcDir();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("includes", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getIncludes();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("includes", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getIncludes();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("excludes", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getExcludes();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("excludes", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getExcludes();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("reportDir", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getReportDir();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("reportDir", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getReportDir();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("enableReports", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getEnableReports();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("enableReports", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getEnableReports();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("remote", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getRemote();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("remote", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getRemote();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("jmeterIgnoreFailure", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getJmeterIgnoreFailure();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("jmeterIgnoreFailure", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getJmeterIgnoreFailure();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("jmeterIgnoreError", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getJmeterIgnoreError();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("jmeterIgnoreError", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getJmeterIgnoreError();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("reportPostfix", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getReportPostfix();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("reportPostfix", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getReportPostfix();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("reportXslt", new ConventionValue() {
-             public Object getValue(Convention convention, IConventionAware iConventionAware) {
-                 return jmeterConvention.getReportXslt();
-             }
-         });
+        jmeterRunTask.getConventionMapping().map("reportXslt", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getReportXslt();
+            }
+        });
 
-        jmeterRunTask.getConventionMapping().map("jmeterUserProperties", new ConventionValue() {
-            public Object getValue(Convention convention, IConventionAware iConventionAware) {
+        jmeterRunTask.getConventionMapping().map("jmeterUserProperties", new Callable<Object>() {
+            public Object call() throws Exception {
                 return jmeterConvention.getJmeterUserProperties();
             }
         });

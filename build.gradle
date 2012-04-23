@@ -1,9 +1,9 @@
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply from: "$rootDir/gradle/maven-deployment.gradle"
+apply plugin: 'maven'
 
 group = 'org.veil.gradle.plugins'
-projectName = 'jmeter-gradle-plugin'
+archivesBaseName = 'jmeter-gradle-plugin'
 version = '1.1-SNAPSHOT'
 
 jmeterVersion = "2.6"
@@ -12,7 +12,9 @@ sourceCompatibility=1.6
 targetCompatibility=1.6
 
 repositories {
-	mavenRepo urls: "http://repo.kulya.info/content/groups/public/"
+    maven {
+        url "http://repo.kulya.info/content/groups/public/"
+    }
 }
 
 dependencies {
@@ -36,3 +38,28 @@ dependencies {
 	
 	testCompile "junit:junit:4.9"
 }
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.java
+}
+
+artifacts {
+    archives sourceJar
+}
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "http://repo.kulya.info/content/repositories/releases/") {
+                authentication(userName: kulyaMvnDeployerUser, password: kulyaMvnDeployerPass)
+            }
+
+            snapshotRepository(url: "http://repo.kulya.info/content/repositories/snapshots/") {
+                authentication(userName: kulyaMvnDeployerUser, password: kulyaMvnDeployerPass)
+            }
+        }
+    }
+}
+
