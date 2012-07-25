@@ -308,12 +308,9 @@ public class JmeterRunTask extends ConventionTask {
     private void initUserProperties(List<String> jmeterArgs) {
         if (jmeterUserProperties != null) {
             for (Object property : jmeterUserProperties.toArray(new Object []{})) {
-//                jmeterArgs.add("-J");
                 jmeterArgs.add("-J" + String.valueOf(property));
             }
         }
-        jmeterArgs.add("-L");
-        jmeterArgs.add("DEBUG");
     }
 
     private boolean checkForEndOfTest(BufferedReader in) {
