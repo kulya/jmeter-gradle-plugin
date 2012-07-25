@@ -8,21 +8,22 @@ include the JMeter plugin as follows:
 
 apply plugin: 'jmeter'
 
-buildscript {
-    repositories {
-        maven {
-            url "http://repo.kulya.info/content/groups/public/"
-      }
+    buildscript {
+        repositories {
+            maven {
+                url "http://repo.kulya.info/content/groups/public/"
+            }
+        }
+        dependencies {
+            classpath "org.veil.gradle.plugins:jmeter-gradle-plugin:1.2-2.6-SNAPSHOT"
+        }
     }
-    dependencies {
-        classpath "org.veil.gradle.plugins:jmeter-gradle-plugin:1.2-2.6-SNAPSHOT"
-    }
-}
 
 2) Tune JMeter plugin to match your sources directory i.e.:
-jmeterRun.configure {
-    jmeterTestFiles = [file("src/test/jmeter/test1.jmx"), file("src/test/jmeter/test2.jmx"), file("src/test/jmeter/test3.jmx")]
-}
+
+    jmeterRun.configure {
+        jmeterTestFiles = [file("src/test/jmeter/test1.jmx"), file("src/test/jmeter/test2.jmx"), file("src/test/jmeter/test3.jmx")]
+    }
 
 3) With this plugin you can specify next JMeter properties:
 * srcDir - Directory with JMeter test files if you want include them all without strict order [ $project.dir/src/test/jmeter by default ]
@@ -36,3 +37,9 @@ jmeterRun.configure {
 * reportPostfix - Postfix that you want to use at report file  [ "-report.html" by default ]
 * reportXslt - Report XSLT location, if you want to use custom transformation
 * jmeterUserProperties - List of JMeter user properties
+
+4) To run JMeter test execute
+    
+    gradle jmeter
+
+At project directory
