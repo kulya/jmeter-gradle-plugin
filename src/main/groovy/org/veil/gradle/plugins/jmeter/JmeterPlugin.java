@@ -13,11 +13,15 @@ public class JmeterPlugin implements Plugin<Project> {
 
     public static final String JMETER_PLUGIN_NAME = "jmeter";
 
+    public static final String PERFORMANCE_GROUP = "performance";
+
     public void apply(final Project project) {
         final JmeterPluginConvention jmeterConvention = new JmeterPluginConvention(project);
 
         Convention convention = project.getConvention();
         convention.getPlugins().put(JMETER_PLUGIN_NAME, jmeterConvention);
+
+
         project.getTasks().withType(JmeterRunTask.class, new Action<JmeterRunTask>() {
             public void execute(JmeterRunTask jmeterRunTask) {
                 configureJmeterTask(project, jmeterConvention, jmeterRunTask);
@@ -25,6 +29,7 @@ public class JmeterPlugin implements Plugin<Project> {
         });
         JmeterRunTask runTask = project.getTasks().add(JMETER_RUN, JmeterRunTask.class);
         runTask.setDescription("Execute JMeter tests");
+        runTask.setGroup(PERFORMANCE_GROUP);
     }
 
     private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunTask jmeterRunTask) {

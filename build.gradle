@@ -4,9 +4,10 @@ apply plugin: 'maven'
 
 group = 'org.veil.gradle.plugins'
 archivesBaseName = 'jmeter-gradle-plugin'
-version = '1.1-SNAPSHOT'
+ext.jmeterVersion = "2.6"
+version = "1.2-$jmeterVersion-SNAPSHOT"
 
-jmeterVersion = "2.6"
+
 
 sourceCompatibility=1.6
 targetCompatibility=1.6
@@ -36,7 +37,7 @@ dependencies {
 	
 	groovy localGroovy()
 	
-	testCompile "junit:junit:4.9"
+	testCompile "junit:junit:4.10"
 }
 
 task sourceJar(type: Jar) {
@@ -48,6 +49,14 @@ artifacts {
     archives sourceJar
 }
 
+processResources.doLast {
+    println "I'm here :::${project.buildDir}    "
+    ant.replace(
+            file: "${project.buildDir}/resources/main/jmeter-plugin.properties",
+            token: "@jmeter.version@",
+            value: "$jmeterVersion"
+    )
+}
 
 uploadArchives {
     repositories {

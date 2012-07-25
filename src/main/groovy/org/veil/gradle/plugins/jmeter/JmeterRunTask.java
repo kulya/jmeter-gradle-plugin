@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 public class JmeterRunTask extends ConventionTask {
 
@@ -109,9 +110,12 @@ public class JmeterRunTask extends ConventionTask {
 
     private static final String JMETER_DEFAULT_PROPERTY_NAME = "jmeter.properties";
 
+    private String jmeterVersion;
+
 
     @TaskAction
     public void start() throws IOException {
+        loadJMeterVersion();
 
         loadPropertiesFromConvention();
 
@@ -140,6 +144,22 @@ public class JmeterRunTask extends ConventionTask {
         }
         checkForErrors(results);
 
+    }
+
+    private void loadJMeterVersion() {
+        try {
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("jmeter-plugin.properties");
+//            String result = IOUtils.toString(is);
+            Properties pluginProps = new Properties();
+            pluginProps.load(is);
+            jmeterVersion = pluginProps.getProperty("jmeter.version", null);
+            if (jmeterVersion == null) {
+                throw new GradleException("You should set correct jmeter.version at jmeter-plugin.properies file");
+            }
+        } catch (Exception e) {
+            log.error("Can't load JMeter version, build will stop", e);
+            throw new GradleException("Can't load JMeter version, build will stop", e);
+        }
     }
 
     private void loadPropertiesFromConvention() {
@@ -288,10 +308,12 @@ public class JmeterRunTask extends ConventionTask {
     private void initUserProperties(List<String> jmeterArgs) {
         if (jmeterUserProperties != null) {
             for (Object property : jmeterUserProperties.toArray(new Object []{})) {
-                jmeterArgs.add("-J");
-                jmeterArgs.add(String.valueOf(property));
+//                jmeterArgs.add("-J");
+                jmeterArgs.add("-J" + String.valueOf(property));
             }
         }
+        jmeterArgs.add("-L");
+        jmeterArgs.add("DEBUG");
     }
 
     private boolean checkForEndOfTest(BufferedReader in) {
@@ -346,8 +368,10 @@ public class JmeterRunTask extends ConventionTask {
     private void resolveJmeterSearchPath() {
         String cp = "";
         URL[] classPath = ((URLClassLoader)this.getClass().getClassLoader()).getURLs();
+        String jmeterVersionPattern = jmeterVersion.replaceAll("[.]", "[.]");
         for (URL dep : classPath) {
-            if (dep.getPath().matches("^.*org[.]apache[.]jmeter[/]jmeter-.*2[.]5[.]3[.]jar$")) {
+            if (dep.getPath().matches("^.*org[.]apache[.]jmeter[/]jmeter-.*" +
+                     jmeterVersionPattern + ".jar$")) {
                 cp += dep.getPath() + ";";
             } else if (dep.getPath().matches("^.*bsh.*[.]jar$")) {
                 cp += dep.getPath() + ";";
