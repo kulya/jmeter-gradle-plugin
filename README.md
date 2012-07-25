@@ -6,7 +6,7 @@ USAGE
 1) Create a build.gradle file in the root directory of the project, and
 include the JMeter plugin as follows:
 
-apply plugin: 'jmeter'
+    apply plugin: 'jmeter'
 
     buildscript {
         repositories {
