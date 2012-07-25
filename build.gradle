@@ -4,8 +4,8 @@ apply plugin: 'maven'
 
 group = 'org.veil.gradle.plugins'
 archivesBaseName = 'jmeter-gradle-plugin'
-ext.jmeterVersion = "2.6"
-version = "1.2-$jmeterVersion-SNAPSHOT"
+ext.jmeterVersion = "2.7"
+version = "1.2-$jmeterVersion"
 
 
 
@@ -50,7 +50,6 @@ artifacts {
 }
 
 processResources.doLast {
-    println "I'm here :::${project.buildDir}    "
     ant.replace(
             file: "${project.buildDir}/resources/main/jmeter-plugin.properties",
             token: "@jmeter.version@",
