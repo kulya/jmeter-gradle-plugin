@@ -10,7 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.TransformerException;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.Permission;
@@ -149,7 +157,6 @@ public class JmeterRunTask extends ConventionTask {
     private void loadJMeterVersion() {
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream("jmeter-plugin.properties");
-//            String result = IOUtils.toString(is);
             Properties pluginProps = new Properties();
             pluginProps.load(is);
             jmeterVersion = pluginProps.getProperty("jmeter.version", null);
