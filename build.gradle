@@ -4,8 +4,8 @@ apply plugin: 'maven'
 
 group = 'org.veil.gradle.plugins'
 archivesBaseName = 'jmeter-gradle-plugin'
-ext.jmeterVersion = "2.6"
-version = "1.2-$jmeterVersion-SNAPSHOT"
+ext.jmeterVersion = "2.5.3"
+version = "1.2-$jmeterVersion"
 
 
 
