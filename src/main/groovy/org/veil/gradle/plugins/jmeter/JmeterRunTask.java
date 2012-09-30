@@ -386,8 +386,8 @@ public class JmeterRunTask extends ConventionTask {
 
     private void initTempProperties() throws IOException {
         List<File> tempProperties = new ArrayList<File>();
-
-        String jmeterResultDir = File.separator + "build" + File.separator + "jmeter" + File.separator;
+        String relativeBuildDir = getProject().getBuildDir().getAbsolutePath().substring(getProject().getProjectDir().getAbsolutePath().length());
+        String jmeterResultDir = File.separator +  relativeBuildDir + File.separator + "jmeter" + File.separator;
 
         File saveServiceProperties = new File(workDir, "saveservice.properties");
         System.setProperty("saveservice_properties", jmeterResultDir + saveServiceProperties.getName());
