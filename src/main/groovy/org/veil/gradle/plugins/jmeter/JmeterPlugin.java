@@ -104,5 +104,11 @@ public class JmeterPlugin implements Plugin<Project> {
                 return jmeterConvention.getJmeterUserProperties();
             }
         });
+
+        jmeterRunTask.getConventionMapping().map("jmeterPluginJars", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getJmeterPluginJars();
+            }
+        });
     }
 }
