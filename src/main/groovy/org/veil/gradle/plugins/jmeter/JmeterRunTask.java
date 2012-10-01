@@ -111,7 +111,8 @@ public class JmeterRunTask extends ConventionTask {
     private File reportXslt;
 
     private List<String> jmeterUserProperties;
-
+    private List<String> jmeterPluginJars;
+    
     private File workDir;
     private File jmeterLog;
     private DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
@@ -182,6 +183,7 @@ public class JmeterRunTask extends ConventionTask {
         includes = getIncludes();
         excludes = getExcludes();
         jmeterUserProperties = getJmeterUserProperties();
+        jmeterPluginJars = getJmeterPluginJars();
     }
 
      private void checkForErrors(List<String> results) {
@@ -379,6 +381,12 @@ public class JmeterRunTask extends ConventionTask {
                 cp += dep.getPath() + ";";
             } else if (dep.getPath().matches("^.*bsh.*[.]jar$")) {
                 cp += dep.getPath() + ";";
+            } else if (jmeterPluginJars != null){
+            	for (String plugin: jmeterPluginJars) {
+            		if(dep.getPath().matches("^.*" + plugin + "$")) {
+                        cp += dep.getPath() + ";";
+            		}
+            	}
             }
         }
         System.setProperty("search_paths", cp);
@@ -386,8 +394,8 @@ public class JmeterRunTask extends ConventionTask {
 
     private void initTempProperties() throws IOException {
         List<File> tempProperties = new ArrayList<File>();
-
-        String jmeterResultDir = File.separator + "build" + File.separator + "jmeter" + File.separator;
+        String relativeBuildDir = getProject().getBuildDir().getAbsolutePath().substring(getProject().getProjectDir().getAbsolutePath().length());
+        String jmeterResultDir = File.separator +  relativeBuildDir + File.separator + "jmeter" + File.separator;
 
         File saveServiceProperties = new File(workDir, "saveservice.properties");
         System.setProperty("saveservice_properties", jmeterResultDir + saveServiceProperties.getName());
@@ -505,4 +513,12 @@ public class JmeterRunTask extends ConventionTask {
     public void setJmeterUserProperties(List<String> jmeterUserProperties) {
         this.jmeterUserProperties = jmeterUserProperties;
     }
+    
+    private List<String> getJmeterPluginJars() {
+    	return jmeterPluginJars;
+    }
+    
+    public void setJmeterPluginJars(List<String> jmeterPluginJars) {
+		this.jmeterPluginJars = jmeterPluginJars;
+	}
 }

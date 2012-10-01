@@ -85,6 +85,8 @@ public class JmeterPluginConvention {
 
     private List<String> jmeterUserProperties;
 
+    private List<String> jmeterPluginJars;
+
     public JmeterPluginConvention(Project project) {
         reportDir = new File(project.getBuildDir(), "jmeter-report");
         srcDir = new File(project.getProjectDir(), "src/test/jmeter");
@@ -185,4 +187,12 @@ public class JmeterPluginConvention {
     public void setJmeterUserProperties(List<String> jmeterUserProperties) {
         this.jmeterUserProperties = jmeterUserProperties;
     }
+    
+    public List<String> getJmeterPluginJars() {
+		return jmeterPluginJars;
+	}
+    
+    public void setJmeterPluginJars(List<String> jmeterPluginJars) {
+		this.jmeterPluginJars = jmeterPluginJars;
+	}
 }
