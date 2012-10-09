@@ -4,10 +4,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jmeter.JMeter;
 import org.apache.tools.ant.DirectoryScanner;
 import org.gradle.api.GradleException;
-import org.gradle.api.internal.ConventionTask;
-import org.gradle.api.tasks.TaskAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.TransformerException;
 import java.io.BufferedReader;
@@ -16,11 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.Permission;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,11 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
-public class JmeterRunTask extends ConventionTask {
-
-    private static final Logger log = LoggerFactory.getLogger(JmeterRunTask.class);
+public class JmeterRunTask extends JmeterAbstractTask {
 
     /**
      * Path to a Jmeter test XML file.
@@ -40,13 +30,6 @@ public class JmeterRunTask extends ConventionTask {
      * May be declared instead of the parameter includes.
      */
     private List<File> jmeterTestFiles;
-
-    /**
-     * Directory under which JMeter test XML files are stored.
-     * <p/>
-     * By default it src/test/jmeter
-     */
-    private File srcDir;
 
     /**
      * Sets the list of include patterns to use in directory scan for JMeter Test XML files.
@@ -110,26 +93,10 @@ public class JmeterRunTask extends ConventionTask {
      */
     private File reportXslt;
 
-    private List<String> jmeterUserProperties;
-    private List<String> jmeterPluginJars;
-    
-    private File workDir;
-    private File jmeterLog;
     private DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
 
-    private static final String JMETER_DEFAULT_PROPERTY_NAME = "jmeter.properties";
-
-    private String jmeterVersion;
-
-
-    @TaskAction
-    public void start() throws IOException {
-        loadJMeterVersion();
-
-        loadPropertiesFromConvention();
-
-        initJmeterSystemProperties();
-
+    @Override
+    protected void runTaskAction() throws IOException {
         List<String> testFiles = new ArrayList<String>();
         if (jmeterTestFiles != null) {
             for (File f : jmeterTestFiles) {
@@ -155,26 +122,13 @@ public class JmeterRunTask extends ConventionTask {
 
     }
 
-    private void loadJMeterVersion() {
-        try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("jmeter-plugin.properties");
-            Properties pluginProps = new Properties();
-            pluginProps.load(is);
-            jmeterVersion = pluginProps.getProperty("jmeter.version", null);
-            if (jmeterVersion == null) {
-                throw new GradleException("You should set correct jmeter.version at jmeter-plugin.properies file");
-            }
-        } catch (Exception e) {
-            log.error("Can't load JMeter version, build will stop", e);
-            throw new GradleException("Can't load JMeter version, build will stop", e);
-        }
-    }
 
-    private void loadPropertiesFromConvention() {
+    @Override
+    protected void loadPropertiesFromConvention() {
+        super.loadPropertiesFromConvention();
         jmeterIgnoreError = getJmeterIgnoreError();
         jmeterIgnoreFailure = getJmeterIgnoreFailure();
         jmeterTestFiles = getJmeterTestFiles();
-        srcDir = getSrcDir();
         reportDir = getReportDir();
         remote = getRemote();
         enableReports = getEnableReports();
@@ -182,8 +136,6 @@ public class JmeterRunTask extends ConventionTask {
         reportXslt = getReportXslt();
         includes = getIncludes();
         excludes = getExcludes();
-        jmeterUserProperties = getJmeterUserProperties();
-        jmeterPluginJars = getJmeterPluginJars();
     }
 
      private void checkForErrors(List<String> results) {
@@ -251,7 +203,7 @@ public class JmeterRunTask extends ConventionTask {
                      "-t", testFile.getCanonicalPath(),
                      "-l", resultFile.getCanonicalPath(),
                      "-d", getProject().getProjectDir().getCanonicalPath(),
-                     "-p", srcDir + File.separator + JMETER_DEFAULT_PROPERTY_NAME));
+                     "-p", getSrcDir().getAbsolutePath() + File.separator + JMETER_DEFAULT_PROPERTY_NAME));
 
             initUserProperties(args);
 
@@ -261,36 +213,14 @@ public class JmeterRunTask extends ConventionTask {
             log.debug("JMeter is called with the following command line arguments: " + args.toString());
 
 
-            System.setSecurityManager(new SecurityManager() {
+            setCustomSecurityManager();
 
-                @Override
-                public void checkExit(int status) {
-                    throw new ExitException(status);
-                }
-
-                @Override
-                public void checkPermission(Permission perm, Object context) {
-                }
-
-                @Override
-                public void checkPermission(Permission perm) {
-                }
-            });
-
-            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
-                public void uncaughtException(Thread t, Throwable e) {
-                    if (e instanceof ExitException && ((ExitException) e).getCode() == 0) {
-                        return; // Ignore
-                    }
-                    log.error("Error in thread " + t.getName());
-                }
-            });
+            setCustomUncaughtExceptionHandler();
 
             try {
                 JMeter jmeter = new JMeter();
                 jmeter.start(args.toArray(new String[]{}));
-                BufferedReader in = new BufferedReader(new FileReader(jmeterLog));
+                BufferedReader in = new BufferedReader(new FileReader(getJmeterLog()));
                 while (!checkForEndOfTest(in)) {
                     try {
                         Thread.sleep(1000);
@@ -314,13 +244,6 @@ public class JmeterRunTask extends ConventionTask {
         }
     }
 
-    private void initUserProperties(List<String> jmeterArgs) {
-        if (jmeterUserProperties != null) {
-            for (Object property : jmeterUserProperties.toArray(new Object []{})) {
-                jmeterArgs.add("-J" + String.valueOf(property));
-            }
-        }
-    }
 
     private boolean checkForEndOfTest(BufferedReader in) {
         boolean testEnded = false;
@@ -344,7 +267,7 @@ public class JmeterRunTask extends ConventionTask {
     private List<String> scanSourceFolder() {
         List<String> result = new ArrayList<String>();
         DirectoryScanner scaner = new DirectoryScanner();
-        scaner.setBasedir(srcDir);
+        scaner.setBasedir(getSrcDir());
         scaner.setIncludes(includes == null ? new String[]{"**/*.jmx"} : includes.toArray(new String[]{}));
         if (excludes != null) {
             scaner.setExcludes(excludes.toArray(new String[]{}));
@@ -356,82 +279,12 @@ public class JmeterRunTask extends ConventionTask {
         return result;
     }
 
-    private void initJmeterSystemProperties() throws IOException {
-        workDir = new File(getProject().getBuildDir(), "/jmeter");
-        workDir.mkdirs();
-
-
-        jmeterLog = new File(workDir, "jmeter.log");
-        try {
-            System.setProperty("log_file", jmeterLog.getCanonicalPath());
-        } catch (IOException e) {
-            throw new GradleException("Can't get canonical path for log file", e);
-        }
-        initTempProperties();
-        resolveJmeterSearchPath();
-    }
-
-    private void resolveJmeterSearchPath() {
-        String cp = "";
-        URL[] classPath = ((URLClassLoader)this.getClass().getClassLoader()).getURLs();
-        String jmeterVersionPattern = jmeterVersion.replaceAll("[.]", "[.]");
-        for (URL dep : classPath) {
-            if (dep.getPath().matches("^.*org[.]apache[.]jmeter[/]jmeter-.*" +
-                     jmeterVersionPattern + ".jar$")) {
-                cp += dep.getPath() + ";";
-            } else if (dep.getPath().matches("^.*bsh.*[.]jar$")) {
-                cp += dep.getPath() + ";";
-            } else if (jmeterPluginJars != null){
-            	for (String plugin: jmeterPluginJars) {
-            		if(dep.getPath().matches("^.*" + plugin + "$")) {
-                        cp += dep.getPath() + ";";
-            		}
-            	}
-            }
-        }
-        System.setProperty("search_paths", cp);
-    }
-
-    private void initTempProperties() throws IOException {
-        List<File> tempProperties = new ArrayList<File>();
-        String relativeBuildDir = getProject().getBuildDir().getAbsolutePath().substring(getProject().getProjectDir().getAbsolutePath().length());
-        String jmeterResultDir = File.separator +  relativeBuildDir + File.separator + "jmeter" + File.separator;
-
-        File saveServiceProperties = new File(workDir, "saveservice.properties");
-        System.setProperty("saveservice_properties", jmeterResultDir + saveServiceProperties.getName());
-        tempProperties.add(saveServiceProperties);
-
-        File upgradeProperties = new File(workDir, "upgrade.properties");
-        System.setProperty("upgrade_properties", jmeterResultDir + saveServiceProperties.getName());
-        tempProperties.add(upgradeProperties);
-
-        for (File f : tempProperties) {
-            try {
-                FileWriter writer = new FileWriter(f);
-                IOUtils.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream(f.getName()), writer);
-                writer.flush();
-                writer.close();
-            } catch (IOException ioe) {
-                throw new GradleException("Couldn't create temporary property file " + f.getName() + " in directory " + workDir.getPath(), ioe);
-            }
-
-        }
-    }
-
     public List<File> getJmeterTestFiles() {
         return jmeterTestFiles;
     }
 
     public void setJmeterTestFiles(List<File> jmeterTestFiles) {
         this.jmeterTestFiles = jmeterTestFiles;
-    }
-
-    public File getSrcDir() {
-        return srcDir;
-    }
-
-    public void setSrcDir(File srcDir) {
-        this.srcDir = srcDir;
     }
 
     public List<String> getIncludes() {
@@ -505,20 +358,4 @@ public class JmeterRunTask extends ConventionTask {
     public void setReportXslt(File reportXslt) {
         this.reportXslt = reportXslt;
     }
-
-    public List<String> getJmeterUserProperties() {
-        return jmeterUserProperties;
-    }
-
-    public void setJmeterUserProperties(List<String> jmeterUserProperties) {
-        this.jmeterUserProperties = jmeterUserProperties;
-    }
-    
-    private List<String> getJmeterPluginJars() {
-    	return jmeterPluginJars;
-    }
-    
-    public void setJmeterPluginJars(List<String> jmeterPluginJars) {
-		this.jmeterPluginJars = jmeterPluginJars;
-	}
 }

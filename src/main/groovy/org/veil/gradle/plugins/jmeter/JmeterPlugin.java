@@ -11,6 +11,8 @@ public class JmeterPlugin implements Plugin<Project> {
 
     public static final String JMETER_RUN = "jmeterRun";
 
+    public static final String JMETER_RUN_GUI = "jmeterEditor";
+
     public static final String JMETER_PLUGIN_NAME = "jmeter";
 
     public static final String PERFORMANCE_GROUP = "performance";
@@ -30,6 +32,16 @@ public class JmeterPlugin implements Plugin<Project> {
         JmeterRunTask runTask = project.getTasks().add(JMETER_RUN, JmeterRunTask.class);
         runTask.setDescription("Execute JMeter tests");
         runTask.setGroup(PERFORMANCE_GROUP);
+
+        project.getTasks().withType(JmeterRunGuiTask.class, new Action<JmeterRunGuiTask>() {
+            @Override
+            public void execute(JmeterRunGuiTask jmeterRunGuiTask) {
+                configureJmeterTask(project, jmeterConvention, jmeterRunGuiTask);
+            }
+        });
+        JmeterRunGuiTask runGuiTask = project.getTasks().add(JMETER_RUN_GUI, JmeterRunGuiTask.class);
+        runGuiTask.setDescription("Start JMeter GUI");
+        runGuiTask.setGroup(PERFORMANCE_GROUP);
     }
 
     private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunTask jmeterRunTask) {
@@ -108,6 +120,27 @@ public class JmeterPlugin implements Plugin<Project> {
         jmeterRunTask.getConventionMapping().map("jmeterPluginJars", new Callable<Object>() {
             public Object call() throws Exception {
                 return jmeterConvention.getJmeterPluginJars();
+            }
+        });
+    }
+
+    private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunGuiTask jmeterRunTask) {
+
+        jmeterRunTask.getConventionMapping().map("jmeterUserProperties", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getJmeterUserProperties();
+            }
+        });
+
+        jmeterRunTask.getConventionMapping().map("jmeterPluginJars", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getJmeterPluginJars();
+            }
+        });
+
+        jmeterRunTask.getConventionMapping().map("srcDir", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getSrcDir();
             }
         });
     }
