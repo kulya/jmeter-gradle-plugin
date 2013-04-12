@@ -87,7 +87,7 @@ abstract class JmeterAbstractTask extends ConventionTask{
         URL[] classPath = ((URLClassLoader)this.getClass().getClassLoader()).getURLs()
         String jmeterVersionPattern = getJmeterVersion().replaceAll("[.]", "[.]")
         for (URL dep : classPath) {
-            if (dep.getPath().matches("^.*org[.]apache[.]jmeter[/]jmeter-.*" +
+            if (dep.getPath().matches("^.*org[.]apache[.]jmeter[/]ApacheJMeter.*" +
                     jmeterVersionPattern + ".jar\$")) {
                 cp += dep.getPath() + ";"
             } else if (dep.getPath().matches("^.*bsh.*[.]jar\$")) {

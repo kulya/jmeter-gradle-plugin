@@ -5,10 +5,10 @@ apply plugin: 'maven'
 group = 'org.veil.gradle.plugins'
 archivesBaseName = 'jmeter-gradle-plugin'
 /**
- * Currently support JMeter version 2.5.3, 2.6, 2.7, 2.8
+ * Currently support JMeter version 2.6, 2.7, 2.8, 2.9
  */
 ext.jmeterVersion = "2.8"
-version = "1.3-$jmeterVersion-SNAPSHOT"
+version = "1.3.1-$jmeterVersion-SNAPSHOT"
 
 
 
@@ -23,27 +23,27 @@ repositories {
 
 dependencies {
 	compile gradleApi(),
-        "org.apache.jmeter:jmeter-http:${jmeterVersion}",
-		"org.apache.jmeter:jmeter-junit:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-java:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-report:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-jdbc:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-tcp:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-mail:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-ldap:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-ftp:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-functions:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-monitor-components:${jmeterVersion}",
-        "org.apache.jmeter:jmeter-jms:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_http:${jmeterVersion}",
+		"org.apache.jmeter:ApacheJMeter_junit:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_java:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_report:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_jdbc:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_tcp:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_mail:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_ldap:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_ftp:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_functions:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_monitors:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter_jms:${jmeterVersion}",
+        "org.apache.jmeter:ApacheJMeter:${jmeterVersion}",
         "org.beanshell:bsh-core:2.0b4"
-
     if (jmeterVersion > '2.7') {
-        compile "org.apache.jmeter:jmeter-native:${jmeterVersion}"
+        compile "org.apache.jmeter:ApacheJMeter_native:${jmeterVersion}"
     }
 	
 	groovy localGroovy()
 	
-	testCompile "junit:junit:4.10"
+	testCompile "junit:junit:4.11"
 }
 
 task sourceJar(type: Jar) {

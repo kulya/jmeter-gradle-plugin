@@ -247,10 +247,11 @@ public class JmeterRunTask extends JmeterAbstractTask {
 
     private boolean checkForEndOfTest(BufferedReader in) {
         boolean testEnded = false;
+        String testEndsLine = getTestEndsLine();
         try {
             String line;
             while ((line = in.readLine()) != null) {
-                if (line.contains("Test has ended")) {
+                if (line.contains(testEndsLine)) {
                     testEnded = true;
                     break;
                 } else if (line.contains("Could not open")) {
@@ -262,6 +263,21 @@ public class JmeterRunTask extends JmeterAbstractTask {
             throw new GradleException("Can't read log file", e);
         }
         return testEnded;
+    }
+
+    private String getTestEndsLine() {
+        String [] version = getJmeterVersion().split(".");
+        String result = "Test has ended";
+        int major = Integer.valueOf(version[0]);
+        int minor = Integer.valueOf(version[1]);
+        if (major == 2) {
+            if (minor > 7) {
+                result = "Notifying test listeners of end of test";
+            }
+        } else if (major > 2) {
+            result = "Notifying test listeners of end of test";
+        }
+        return result;
     }
 
     private List<String> scanSourceFolder() {
