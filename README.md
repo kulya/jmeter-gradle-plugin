@@ -36,6 +36,7 @@ include the JMeter plugin as follows:
 * jmeterIgnoreError - Ignore JMeter errors [ false by default ]
 * reportPostfix - Postfix that you want to use at report file  [ "-report.html" by default ]
 * reportXslt - Report XSLT location, if you want to use custom transformation
+* jmeterPropertyFile - alternate properties file to be used with the -p jmeter option [ srcDir/jmeter.properties by default ]
 * jmeterUserProperties - List of JMeter user properties
 
 4) To run JMeter test execute
