@@ -122,6 +122,12 @@ public class JmeterPlugin implements Plugin<Project> {
                 return jmeterConvention.getJmeterPluginJars();
             }
         });
+
+        jmeterRunTask.getConventionMapping().map("jmeterPropertyFile", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getJmeterPropertyFile();
+            }
+        });
     }
 
     private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunGuiTask jmeterRunTask) {

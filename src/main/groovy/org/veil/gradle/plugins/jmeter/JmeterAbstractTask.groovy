@@ -31,7 +31,7 @@ abstract class JmeterAbstractTask extends ConventionTask{
      */
     private File srcDir;
 
-    public static final String JMETER_DEFAULT_PROPERTY_NAME = "jmeter.properties";
+    private File jmeterPropertyFile;
 
     @TaskAction
     public void start() {
@@ -46,6 +46,7 @@ abstract class JmeterAbstractTask extends ConventionTask{
     protected abstract void runTaskAction() throws IOException;
 
     protected void loadPropertiesFromConvention() {
+        jmeterPropertyFile = getJmeterPropertyFile()
         jmeterPluginJars = getJmeterPluginJars()
         jmeterUserProperties = getJmeterUserProperties()
         srcDir = getSrcDir()
@@ -211,5 +212,13 @@ abstract class JmeterAbstractTask extends ConventionTask{
 
     void setSrcDir(File srcDir) {
         this.srcDir = srcDir
+    }
+
+    File getJmeterPropertyFile() {
+        this.jmeterPropertyFile
+    }
+
+    void setJmeterPropertyFile(File jmeterPropertyFile) {
+        this.jmeterPropertyFile = jmeterPropertyFile
     }
 }

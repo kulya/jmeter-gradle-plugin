@@ -14,7 +14,7 @@ class JmeterRunGuiTask extends JmeterAbstractTask{
             List<String> args = new ArrayList<String>();
             args.addAll(Arrays.asList(
                     "-d", getProject().getProjectDir().getCanonicalPath(),
-                    "-p", srcDir.getAbsolutePath() + File.separator + JMETER_DEFAULT_PROPERTY_NAME));
+                    "-p", getJmeterPropertyFile().getCanonicalPath()));
 
             initUserProperties(args);
 
@@ -69,6 +69,4 @@ class JmeterRunGuiTask extends JmeterAbstractTask{
         }
         return testEnded;
     }
-
-
 }
