@@ -266,7 +266,7 @@ public class JmeterRunTask extends JmeterAbstractTask {
     }
 
     private String getTestEndsLine() {
-        String [] version = getJmeterVersion().split(".");
+        String [] version = getJmeterVersion().split("\\.");
         String result = "Test has ended";
         int major = Integer.valueOf(version[0]);
         int minor = Integer.valueOf(version[1]);
