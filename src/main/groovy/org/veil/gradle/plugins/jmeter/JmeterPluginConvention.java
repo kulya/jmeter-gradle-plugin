@@ -87,9 +87,14 @@ public class JmeterPluginConvention {
 
     private List<String> jmeterPluginJars;
 
+    private File jmeterPropertyFile;
+
+    private static final String JMETER_DEFAULT_PROPERTY_NAME = "jmeter.properties";
+
     public JmeterPluginConvention(Project project) {
         reportDir = new File(project.getBuildDir(), "jmeter-report");
         srcDir = new File(project.getProjectDir(), "src/test/jmeter");
+        jmeterPropertyFile = new File(srcDir.getAbsolutePath() + File.separator + JMETER_DEFAULT_PROPERTY_NAME);
     }
 
     public List<File> getJmeterTestFiles() {
@@ -189,10 +194,19 @@ public class JmeterPluginConvention {
     }
     
     public List<String> getJmeterPluginJars() {
-		return jmeterPluginJars;
-	}
+        return jmeterPluginJars;
+    }
     
     public void setJmeterPluginJars(List<String> jmeterPluginJars) {
-		this.jmeterPluginJars = jmeterPluginJars;
-	}
+        this.jmeterPluginJars = jmeterPluginJars;
+    }
+
+    public File getJmeterPropertyFile() {
+        return this.jmeterPropertyFile;
+    }
+
+    public void setJmeterPropertyFile(File jmeterPropertyFile) {
+        this.jmeterPropertyFile = jmeterPropertyFile;
+    }
 }
+

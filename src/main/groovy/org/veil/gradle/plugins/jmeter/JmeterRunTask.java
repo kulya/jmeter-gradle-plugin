@@ -203,7 +203,7 @@ public class JmeterRunTask extends JmeterAbstractTask {
                      "-t", testFile.getCanonicalPath(),
                      "-l", resultFile.getCanonicalPath(),
                      "-d", getProject().getProjectDir().getCanonicalPath(),
-                     "-p", getSrcDir().getAbsolutePath() + File.separator + JMETER_DEFAULT_PROPERTY_NAME));
+                     "-p", getJmeterPropertyFile().getCanonicalPath()));
 
             initUserProperties(args);
 
