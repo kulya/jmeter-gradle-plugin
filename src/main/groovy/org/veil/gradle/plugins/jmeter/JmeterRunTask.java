@@ -93,7 +93,7 @@ public class JmeterRunTask extends JmeterAbstractTask {
      */
     private File reportXslt;
 
-    private DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+    private DateFormat fmt = new SimpleDateFormat("yyyyMMdd-HHmm");
 
     @Override
     protected void runTaskAction() throws IOException {
