@@ -89,7 +89,7 @@ public class JmeterPluginConvention {
 
     private File jmeterPropertyFile;
 
-    private static final String JMETER_DEFAULT_PROPERTY_NAME = "jmeter.properties";
+    public static final String JMETER_DEFAULT_PROPERTY_NAME = "jmeter.properties";
 
     public JmeterPluginConvention(Project project) {
         reportDir = new File(project.getBuildDir(), "jmeter-report");

@@ -33,6 +33,8 @@ abstract class JmeterAbstractTask extends ConventionTask{
 
     private File jmeterPropertyFile;
 
+    private boolean propertyFileChanged;
+
     @TaskAction
     public void start() {
         loadJMeterVersion();
@@ -88,7 +90,7 @@ abstract class JmeterAbstractTask extends ConventionTask{
         URL[] classPath = ((URLClassLoader)this.getClass().getClassLoader()).getURLs()
         String jmeterVersionPattern = getJmeterVersion().replaceAll("[.]", "[.]")
         for (URL dep : classPath) {
-            if (dep.getPath().matches("^.*org[.]apache[.]jmeter[/]ApacheJMeter.*" +
+            if (dep.getPath().matches("^.*org[./]apache[./]jmeter[/]ApacheJMeter.*" +
                     jmeterVersionPattern + ".jar\$")) {
                 cp += dep.getPath() + ";"
             } else if (dep.getPath().matches("^.*bsh.*[.]jar\$")) {
@@ -212,6 +214,10 @@ abstract class JmeterAbstractTask extends ConventionTask{
 
     void setSrcDir(File srcDir) {
         this.srcDir = srcDir
+        if (!propertyFileChanged) {
+            System.out.println("Here " + this.getClass().getName());
+            setJmeterPropertyFile(new File(srcDir, JmeterPluginConvention.JMETER_DEFAULT_PROPERTY_NAME));
+        }
     }
 
     File getJmeterPropertyFile() {
@@ -220,5 +226,6 @@ abstract class JmeterAbstractTask extends ConventionTask{
 
     void setJmeterPropertyFile(File jmeterPropertyFile) {
         this.jmeterPropertyFile = jmeterPropertyFile
+        propertyFileChanged = true
     }
 }

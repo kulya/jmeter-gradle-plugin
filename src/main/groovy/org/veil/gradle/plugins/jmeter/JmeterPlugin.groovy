@@ -17,12 +17,27 @@ public class JmeterPlugin implements Plugin<Project> {
 
     public static final String PERFORMANCE_GROUP = "performance";
 
+    private JmeterRunGuiTask runGuiTask;
+
+    private JmeterRunTask runTask;
+
     public void apply(final Project project) {
         final JmeterPluginConvention jmeterConvention = new JmeterPluginConvention(project);
 
         Convention convention = project.getConvention();
         convention.getPlugins().put(JMETER_PLUGIN_NAME, jmeterConvention);
 
+//        runGuiTask = project.task(JMETER_RUN_GUI, group: PERFORMANCE_GROUP, description: "Start JMeter GUI", type: JmeterRunGuiTask)
+
+        project.getTasks().withType(JmeterRunGuiTask.class, new Action<JmeterRunGuiTask>() {
+            @Override
+            public void execute(JmeterRunGuiTask jmeterRunGuiTask) {
+                configureJmeterAbstractTask(project, jmeterConvention, jmeterRunGuiTask);
+            }
+        });
+        JmeterRunGuiTask runGuiTask = project.getTasks().add(JMETER_RUN_GUI, JmeterRunGuiTask.class);
+        runGuiTask.setDescription("Start JMeter GUI");
+        runGuiTask.setGroup(PERFORMANCE_GROUP);
 
         project.getTasks().withType(JmeterRunTask.class, new Action<JmeterRunTask>() {
             public void execute(JmeterRunTask jmeterRunTask) {
@@ -33,27 +48,14 @@ public class JmeterPlugin implements Plugin<Project> {
         runTask.setDescription("Execute JMeter tests");
         runTask.setGroup(PERFORMANCE_GROUP);
 
-        project.getTasks().withType(JmeterRunGuiTask.class, new Action<JmeterRunGuiTask>() {
-            @Override
-            public void execute(JmeterRunGuiTask jmeterRunGuiTask) {
-                configureJmeterTask(project, jmeterConvention, jmeterRunGuiTask);
-            }
-        });
-        JmeterRunGuiTask runGuiTask = project.getTasks().add(JMETER_RUN_GUI, JmeterRunGuiTask.class);
-        runGuiTask.setDescription("Start JMeter GUI");
-        runGuiTask.setGroup(PERFORMANCE_GROUP);
+
     }
 
     private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunTask jmeterRunTask) {
+        configureJmeterAbstractTask(project, jmeterConvention, jmeterRunTask);
         jmeterRunTask.getConventionMapping().map("jmeterTestFiles", new Callable<Object>() {
             public Object call() throws Exception {
                 return jmeterConvention.getJmeterTestFiles();
-            }
-        });
-
-        jmeterRunTask.getConventionMapping().map("srcDir", new Callable<Object>() {
-            public Object call() throws Exception {
-                return jmeterConvention.getSrcDir();
             }
         });
 
@@ -110,43 +112,31 @@ public class JmeterPlugin implements Plugin<Project> {
                 return jmeterConvention.getReportXslt();
             }
         });
-
-        jmeterRunTask.getConventionMapping().map("jmeterUserProperties", new Callable<Object>() {
-            public Object call() throws Exception {
-                return jmeterConvention.getJmeterUserProperties();
-            }
-        });
-
-        jmeterRunTask.getConventionMapping().map("jmeterPluginJars", new Callable<Object>() {
-            public Object call() throws Exception {
-                return jmeterConvention.getJmeterPluginJars();
-            }
-        });
-
-        jmeterRunTask.getConventionMapping().map("jmeterPropertyFile", new Callable<Object>() {
-            public Object call() throws Exception {
-                return jmeterConvention.getJmeterPropertyFile();
-            }
-        });
     }
 
-    private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunGuiTask jmeterRunTask) {
+    private void configureJmeterAbstractTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterAbstractTask jmeterRunGuiTask) {
 
-        jmeterRunTask.getConventionMapping().map("jmeterUserProperties", new Callable<Object>() {
+        jmeterRunGuiTask.getConventionMapping().map("srcDir", new Callable<Object>() {
+            public Object call() throws Exception {
+                return jmeterConvention.getSrcDir();
+            }
+        });
+
+        jmeterRunGuiTask.getConventionMapping().map("jmeterUserProperties", new Callable<Object>() {
             public Object call() throws Exception {
                 return jmeterConvention.getJmeterUserProperties();
             }
         });
 
-        jmeterRunTask.getConventionMapping().map("jmeterPluginJars", new Callable<Object>() {
+        jmeterRunGuiTask.getConventionMapping().map("jmeterPluginJars", new Callable<Object>() {
             public Object call() throws Exception {
                 return jmeterConvention.getJmeterPluginJars();
             }
         });
 
-        jmeterRunTask.getConventionMapping().map("srcDir", new Callable<Object>() {
+        jmeterRunGuiTask.getConventionMapping().map("jmeterPropertyFile", new Callable<Object>() {
             public Object call() throws Exception {
-                return jmeterConvention.getSrcDir();
+                return jmeterConvention.getJmeterPropertyFile();
             }
         });
     }

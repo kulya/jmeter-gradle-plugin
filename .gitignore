@@ -5,3 +5,4 @@
 /out/
 /build/
 /.idea/
+src/main/groovy/org/veil/gradle/plugins/.DS_Store
