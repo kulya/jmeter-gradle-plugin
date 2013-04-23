@@ -1,4 +1,4 @@
-package org.veil.gradle.plugins.jmeter;
+package com.github.kulya.gradle.plugins.jmeter;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;

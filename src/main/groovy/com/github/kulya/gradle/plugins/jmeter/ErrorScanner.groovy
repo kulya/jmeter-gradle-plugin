@@ -1,4 +1,4 @@
-package org.veil.gradle.plugins.jmeter
+package com.github.kulya.gradle.plugins.jmeter
 
 import org.gradle.api.GradleException
 import java.io.BufferedReader

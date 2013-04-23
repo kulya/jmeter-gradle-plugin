@@ -1,4 +1,4 @@
-package org.veil.gradle.plugins.jmeter;
+package com.github.kulya.gradle.plugins.jmeter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jmeter.JMeter;
@@ -14,7 +14,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Permission;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

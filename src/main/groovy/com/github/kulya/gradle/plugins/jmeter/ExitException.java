@@ -1,4 +1,4 @@
-package org.veil.gradle.plugins.jmeter;
+package com.github.kulya.gradle.plugins.jmeter;
 
 public class ExitException extends SecurityException {
 
