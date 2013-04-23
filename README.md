@@ -5,6 +5,7 @@ USAGE
 =====
 1) Create a build.gradle file in the root directory of the project, and
 include the JMeter plugin as follows:
+If you use plugin version before 1.3.1 please use next code to setup project
 
     apply plugin: 'jmeter'
 
@@ -15,9 +16,21 @@ include the JMeter plugin as follows:
             }
         }
         dependencies {
-            classpath "org.veil.gradle.plugins:jmeter-gradle-plugin:1.2-2.6-SNAPSHOT"
+            classpath "org.veil.gradle.plugins:jmeter-gradle-plugin:1.2-2.6"
         }
     }
+
+If it is 1.3.1 and above
+    apply plugin: 'jmeter'
+
+        buildscript {
+            repositories {
+                mavenCentral()
+            }
+            dependencies {
+                classpath "com.github.kulya.gradle.plugins:jmeter-gradle-plugin:1.3.1-2.6"
+            }
+        }
 
 2) Tune JMeter plugin to match your sources directory i.e.:
 
