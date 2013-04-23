@@ -28,7 +28,7 @@ If it is 1.3.1 and above
                 mavenCentral()
             }
             dependencies {
-                classpath "com.github.kulya.gradle.plugins:jmeter-gradle-plugin:1.3.1-2.6"
+                classpath "com.github.kulya:jmeter-gradle-plugin:1.3.1-2.6"
             }
         }
 
