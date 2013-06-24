@@ -54,6 +54,12 @@ If it is 1.3.1 and above
 
 4) To run JMeter test execute
     
-    gradle jmeter
+    gradle jmeterRun
+
+At project directory
+
+5) To run JMeter gui execute
+
+    gradle jmeterEditor
 
 At project directory
