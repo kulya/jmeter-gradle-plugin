@@ -42,10 +42,24 @@ abstract class JmeterAbstractTask extends ConventionTask{
         loadPropertiesFromConvention();
 
         initJmeterSystemProperties();
+
+        createJMeterDirectories()
+
         runTaskAction();
     }
 
     protected abstract void runTaskAction() throws IOException;
+
+    def createJMeterDirectories() {
+        def jmeterLibFolder = new File(workDir, "lib")
+        jmeterLibFolder.mkdir()
+
+        def jmeterExtFolder = new File(jmeterLibFolder, "ext")
+        jmeterExtFolder.mkdir()
+
+        def jmeterJUnitFolder = new File(jmeterLibFolder, "junit")
+        jmeterJUnitFolder.mkdir()
+    }
 
     protected void loadPropertiesFromConvention() {
         jmeterPropertyFile = getJmeterPropertyFile()
@@ -81,8 +95,22 @@ abstract class JmeterAbstractTask extends ConventionTask{
         } catch (IOException e) {
             throw new GradleException("Can't get canonical path for log file", e)
         }
+
+        System.setProperty("jmeter.home", workDir.getCanonicalPath())
+        log.info("jmeter home is set ot " + System.getProperty("jmeter.home"))
         initTempProperties()
         resolveJmeterSearchPath()
+        dirtyJMeterHackToMakeItReadJmeterHome()
+
+    }
+
+    def dirtyJMeterHackToMakeItReadJmeterHome() {
+        def systemClassPath = System.getProperty("java.class.path");
+        if (systemClassPath != null) {
+            System.setProperty("java.class.path", systemClassPath + File.pathSeparator
+                                                + systemClassPath + File.pathSeparator
+                                                + systemClassPath + File.pathSeparator)
+        }
     }
 
     protected void resolveJmeterSearchPath() {
@@ -104,19 +132,19 @@ abstract class JmeterAbstractTask extends ConventionTask{
             }
         }
         System.setProperty("search_paths", cp);
+        log.debug("Search path is set to " + System.getProperty("search_paths"))
     }
 
     protected void initTempProperties() throws IOException {
         List<File> tempProperties = new ArrayList<File>();
-        String relativeBuildDir = getProject().getBuildDir().getAbsolutePath().substring(getProject().getProjectDir().getAbsolutePath().length());
-        String jmeterResultDir = File.separator +  relativeBuildDir + File.separator + "jmeter" + File.separator;
 
         File saveServiceProperties = new File(workDir, "saveservice.properties");
-        System.setProperty("saveservice_properties", jmeterResultDir + saveServiceProperties.getName());
+        System.setProperty("saveservice_properties", "/" + saveServiceProperties.getName());
         tempProperties.add(saveServiceProperties);
+        log.debug("saveservice_properties location is " + System.getProperty("saveservice_properties"))
 
         File upgradeProperties = new File(workDir, "upgrade.properties");
-        System.setProperty("upgrade_properties", jmeterResultDir + saveServiceProperties.getName());
+        System.setProperty("upgrade_properties", "/" + upgradeProperties.getName());
         tempProperties.add(upgradeProperties);
 
         for (File f : tempProperties) {

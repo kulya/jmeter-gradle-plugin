@@ -161,11 +161,16 @@ public class JmeterRunTask extends JmeterAbstractTask {
                 transformer.transform(resultFile, outputFile);
             }
         } catch (FileNotFoundException e) {
+            log.error("Can't transfrorm result", e);
             throw new GradleException("Error writing report file jmeter file.", e);
         } catch (TransformerException e) {
+            log.error("Can't transfrorm result", e);
             throw new GradleException("Error transforming jmeter results", e);
         } catch (IOException e) {
+            log.error("Can't transfrorm result", e);
             throw new GradleException("Error copying resources to jmeter results", e);
+        }  catch (Exception e) {
+            log.error("Can't transfrorm result", e);
         }
     }
 
@@ -201,7 +206,7 @@ public class JmeterRunTask extends JmeterAbstractTask {
              args.addAll(Arrays.asList("-n",
                      "-t", testFile.getCanonicalPath(),
                      "-l", resultFile.getCanonicalPath(),
-                     "-d", getProject().getProjectDir().getCanonicalPath(),
+                     "-d", getWorkDir().getAbsolutePath(),
                      "-p", getJmeterPropertyFile().getCanonicalPath()));
 
             initUserProperties(args);
