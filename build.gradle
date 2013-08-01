@@ -1,6 +1,5 @@
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.github.kulya'
@@ -70,10 +69,6 @@ artifacts {
     archives javadocJar
 }
 
-signing {
-    sign configurations.archives
-}
-
 processResources.doLast {
     ant.replace(
             file: "${project.buildDir}/resources/main/jmeter-plugin.properties",
@@ -82,53 +77,4 @@ processResources.doLast {
     )
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-
-            pom.project {
-                name 'jmeter-gradle-plugin'
-                packaging 'jar'
-                description 'Add support for running jmeter tests from gradle'
-                url 'https://github.com/kulya/jmeter-gradle-plugin'
-                inceptionYear '2011'
-
-                scm {
-                    url 'scm:git@github.com:kulya/jmeter-gradle-plugin.git'
-                    connection 'scm:git@github.com:kulya/jmeter-gradle-plugin.git'
-                    developerConnection 'scm:git@github.com:kulya/jmeter-gradle-plugin.git'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'kulya'
-                        name 'Alexandr Kulik'
-                        url 'https://github.com/kulya/'
-                        email 'alexandr.kulik1988@gmail.com'
-                        roles { role 'Developer' }
-                    }
-                }
-
-            }
-        }
-    }
-}
 
