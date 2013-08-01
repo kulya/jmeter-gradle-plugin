@@ -27,8 +27,6 @@ public class JmeterPlugin implements Plugin<Project> {
         Convention convention = project.getConvention();
         convention.getPlugins().put(JMETER_PLUGIN_NAME, jmeterConvention);
 
-//        runGuiTask = project.task(JMETER_RUN_GUI, group: PERFORMANCE_GROUP, description: "Start JMeter GUI", type: JmeterRunGuiTask)
-
         project.getTasks().withType(JmeterRunGuiTask.class, new Action<JmeterRunGuiTask>() {
             @Override
             public void execute(JmeterRunGuiTask jmeterRunGuiTask) {
@@ -47,8 +45,6 @@ public class JmeterPlugin implements Plugin<Project> {
         JmeterRunTask runTask = project.getTasks().add(JMETER_RUN, JmeterRunTask.class);
         runTask.setDescription("Execute JMeter tests");
         runTask.setGroup(PERFORMANCE_GROUP);
-
-
     }
 
     private void configureJmeterTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterRunTask jmeterRunTask) {
@@ -112,6 +108,13 @@ public class JmeterPlugin implements Plugin<Project> {
                 return jmeterConvention.getReportXslt();
             }
         });
+
+        jmeterRunTask.getConventionMapping().map("maxHeapSize", new Callable<Object>() {
+            @Override
+            Object call() throws Exception {
+                return jmeterConvention.getMaxHeapSize();
+            }
+        })
     }
 
     private void configureJmeterAbstractTask(Project project, final JmeterPluginConvention jmeterConvention, JmeterAbstractTask jmeterRunGuiTask) {
@@ -139,5 +142,12 @@ public class JmeterPlugin implements Plugin<Project> {
                 return jmeterConvention.getJmeterPropertyFile();
             }
         });
+
+        jmeterRunGuiTask.getConventionMapping().map("maxHeapSize", new Callable<Object>() {
+            @Override
+            Object call() throws Exception {
+                return jmeterConvention.getMaxHeapSize();
+            }
+        })
     }
 }
