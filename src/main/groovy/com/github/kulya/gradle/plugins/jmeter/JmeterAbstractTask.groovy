@@ -3,16 +3,16 @@ package com.github.kulya.gradle.plugins.jmeter
 import org.apache.commons.io.IOUtils
 import org.gradle.api.GradleException
 import org.gradle.api.internal.ConventionTask
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.TaskAction
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import java.security.Permission
 
 
 abstract class JmeterAbstractTask extends ConventionTask{
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Logger log = Logging.getLogger(getClass());
 
     private String jmeterVersion;
 

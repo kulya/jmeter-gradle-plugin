@@ -19,6 +19,20 @@ class JmeterWorkerServer implements Action<WorkerProcessContext>, Serializable{
 
     @Override
     void execute(WorkerProcessContext workerProcessContext) {
+        JmeterResult result = executeJmeterTest()
+        JmeterWorkerClientProtocol clientProtocol = workerProcessContext.getServerConnection()
+                .addOutgoing(JmeterWorkerClientProtocol.class)
+        clientProtocol.executed(result)
+    }
 
+    private JmeterResult executeJmeterTest() {
+        LOGGER.debug("Executing JMeter worker")
+        try {
+            JmeterExecuter jmeterExecuter = new JmeterExecuter()
+            return jmeterExecuter.runJmeter(specs)
+        } catch (Exception e) {
+            LOGGER.error("Exception occured during jmeter execution", e)
+            return null
+        }
     }
 }
