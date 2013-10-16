@@ -21,6 +21,7 @@ If you use plugin version before 1.3.1 please use next code to setup project
     }
 
 If it is 1.3.1 and above
+
     apply plugin: 'jmeter'
 
         buildscript {
