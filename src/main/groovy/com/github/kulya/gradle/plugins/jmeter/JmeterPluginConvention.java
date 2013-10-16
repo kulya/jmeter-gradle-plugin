@@ -92,7 +92,7 @@ public class JmeterPluginConvention {
     /**
      * The maximum heap size for the forked findbugs process (ex: '1g').
      */
-    private String maxHeapSize;
+    private String maxHeapSize = "512M";
 
     public static final String JMETER_DEFAULT_PROPERTY_NAME = "jmeter.properties";
 

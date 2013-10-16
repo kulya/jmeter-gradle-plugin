@@ -7,9 +7,6 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.TaskAction
 
-import java.security.Permission
-
-
 abstract class JmeterAbstractTask extends ConventionTask{
 
     protected final Logger log = Logging.getLogger(getClass());
@@ -35,6 +32,8 @@ abstract class JmeterAbstractTask extends ConventionTask{
 
     private boolean propertyFileChanged;
 
+    private String maxHeapSize
+
     @TaskAction
     public void start() {
         loadJMeterVersion();
@@ -51,20 +50,18 @@ abstract class JmeterAbstractTask extends ConventionTask{
     protected abstract void runTaskAction() throws IOException;
 
     def createJMeterDirectories() {
-        def jmeterLibFolder = new File(workDir, "lib")
-        jmeterLibFolder.mkdir()
+        def jmeterJUnitFolder = new File(workDir, "lib" + File.separator + "junit")
+        jmeterJUnitFolder.mkdirs()
 
-        def jmeterExtFolder = new File(jmeterLibFolder, "ext")
-        jmeterExtFolder.mkdir()
-
-        def jmeterJUnitFolder = new File(jmeterLibFolder, "junit")
-        jmeterJUnitFolder.mkdir()
+        def jmeterExtFolder = new File(workDir, "lib" + File.separator + "ext")
+        jmeterExtFolder.mkdirs()
     }
 
     protected void loadPropertiesFromConvention() {
         jmeterPropertyFile = getJmeterPropertyFile()
         jmeterPluginJars = getJmeterPluginJars()
         jmeterUserProperties = getJmeterUserProperties()
+        maxHeapSize = getMaxHeapSize()
         srcDir = getSrcDir()
     }
 
@@ -100,38 +97,33 @@ abstract class JmeterAbstractTask extends ConventionTask{
         log.info("jmeter home is set ot " + System.getProperty("jmeter.home"))
         initTempProperties()
         resolveJmeterSearchPath()
-        dirtyJMeterHackToMakeItReadJmeterHome()
 
-    }
-
-    def dirtyJMeterHackToMakeItReadJmeterHome() {
-        def systemClassPath = System.getProperty("java.class.path");
-        if (systemClassPath != null) {
-            System.setProperty("java.class.path", systemClassPath + File.pathSeparator
-                                                + systemClassPath + File.pathSeparator
-                                                + systemClassPath + File.pathSeparator)
-        }
     }
 
     protected void resolveJmeterSearchPath() {
-        String cp = ""
+        StringBuilder cp = new StringBuilder()
         URL[] classPath = ((URLClassLoader)this.getClass().getClassLoader()).getURLs()
         String jmeterVersionPattern = getJmeterVersion().replaceAll("[.]", "[.]")
+        String pathSeparator = /**System.getProperty("path.separator")*/";"
         for (URL dep : classPath) {
             if (dep.getPath().matches("^.*org[./]apache[./]jmeter[/]ApacheJMeter.*" +
                     jmeterVersionPattern + ".jar\$")) {
-                cp += dep.getPath() + ";"
+                cp.append(dep.getPath())
+                cp.append(pathSeparator)
             } else if (dep.getPath().matches("^.*bsh.*[.]jar\$")) {
-                cp += dep.getPath() + ";"
+                cp.append(dep.getPath())
+                cp.append(pathSeparator)
             } else if (jmeterPluginJars != null){
                 for (String plugin: jmeterPluginJars) {
                     if(dep.getPath().matches("^.*" + plugin + "\$")) {
-                        cp += dep.getPath() + ";"
+                        cp.append(dep.getPath())
+                        cp.append(pathSeparator)
                     }
                 }
             }
         }
-        System.setProperty("search_paths", cp);
+        cp.append(new File(workDir, "lib" + File.separator + "ext").getCanonicalPath())
+        System.setProperty("search_paths", cp.toString());
         log.debug("Search path is set to " + System.getProperty("search_paths"))
     }
 
@@ -164,36 +156,6 @@ abstract class JmeterAbstractTask extends ConventionTask{
         if (jmeterUserProperties != null) {
             jmeterUserProperties.each {property -> jmeterArgs.add("-J" + property)}
         }
-    }
-
-    protected void setCustomUncaughtExceptionHandler() {
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
-            public void uncaughtException(Thread t, Throwable e) {
-                if (e instanceof ExitException && ((ExitException) e).getCode() == 0) {
-                    return; // Ignore
-                }
-                log.error("Error in thread " + t.getName());
-            }
-        });
-    }
-
-    protected void setCustomSecurityManager() {
-        System.setSecurityManager(new SecurityManager() {
-
-            @Override
-            public void checkExit(int status) {
-                throw new ExitException(status);
-            }
-
-            @Override
-            public void checkPermission(Permission perm, Object context) {
-            }
-
-            @Override
-            public void checkPermission(Permission perm) {
-            }
-        });
     }
 
     String getJmeterVersion() {
@@ -255,5 +217,13 @@ abstract class JmeterAbstractTask extends ConventionTask{
     void setJmeterPropertyFile(File jmeterPropertyFile) {
         this.jmeterPropertyFile = jmeterPropertyFile
         propertyFileChanged = true
+    }
+
+    String getMaxHeapSize() {
+        return maxHeapSize
+    }
+
+    void setMaxHeapSize(String maxHeapSize) {
+        this.maxHeapSize = maxHeapSize
     }
 }

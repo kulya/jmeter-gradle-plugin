@@ -52,6 +52,7 @@ If it is 1.3.1 and above
 * reportXslt - Report XSLT location, if you want to use custom transformation
 * jmeterPropertyFile - alternate properties file to be used with the -p jmeter option [ srcDir/jmeter.properties by default ]
 * jmeterUserProperties - List of JMeter user properties
+* maxHeapSize - Max heap size for jmeter process by default set to 512M. Support any walue that -Xmx property support.
 
 4) To run JMeter test execute
     

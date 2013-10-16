@@ -1,19 +1,12 @@
 package com.github.kulya.gradle.plugins.jmeter;
 
+import com.github.kulya.gradle.plugins.jmeter.worker.JMeterRunner;
 import org.apache.commons.io.IOUtils;
-import org.apache.jmeter.JMeter;
 import org.apache.tools.ant.DirectoryScanner;
 import org.gradle.api.GradleException;
 
 import javax.xml.transform.TransformerException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -94,6 +87,8 @@ public class JmeterRunTask extends JmeterAbstractTask {
 
     private DateFormat fmt = new SimpleDateFormat("yyyyMMdd-HHmm");
 
+    private String maxHeapSize;
+
     @Override
     protected void runTaskAction() throws IOException {
         List<String> testFiles = new ArrayList<String>();
@@ -135,6 +130,7 @@ public class JmeterRunTask extends JmeterAbstractTask {
         reportXslt = getReportXslt();
         includes = getIncludes();
         excludes = getExcludes();
+        maxHeapSize = getMaxHeapSize();
     }
 
      private void checkForErrors(List<String> results) {
@@ -179,8 +175,10 @@ public class JmeterRunTask extends JmeterAbstractTask {
             //if we are using the default report, also copy the images out.
             IOUtils.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream("reports/collapse.jpg"), new FileOutputStream(this.reportDir.getPath() + File.separator + "collapse.jpg"));
             IOUtils.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream("reports/expand.jpg"), new FileOutputStream(this.reportDir.getPath() + File.separator + "expand.jpg"));
+            log.debug("Using reports/jmeter-results-detail-report_21.xsl for building report");
             return Thread.currentThread().getContextClassLoader().getResourceAsStream("reports/jmeter-results-detail-report_21.xsl");
         } else {
+            log.debug("Using " + this.reportXslt + " for building report");
             return new FileInputStream(this.reportXslt);
         }
     }
@@ -194,10 +192,6 @@ public class JmeterRunTask extends JmeterAbstractTask {
     }
 
     private String executeJmeterTest(String fileLocation) {
-
-        SecurityManager oldManager = System.getSecurityManager();
-        Thread.UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
-
         try {
             File testFile = new File(fileLocation);
             File resultFile = new File(reportDir, testFile.getName() + "-" + fmt.format(new Date()) + ".xml");
@@ -206,8 +200,8 @@ public class JmeterRunTask extends JmeterAbstractTask {
              args.addAll(Arrays.asList("-n",
                      "-t", testFile.getCanonicalPath(),
                      "-l", resultFile.getCanonicalPath(),
-                     "-d", getWorkDir().getAbsolutePath(),
                      "-p", getJmeterPropertyFile().getCanonicalPath()));
+
 
             initUserProperties(args);
 
@@ -217,71 +211,19 @@ public class JmeterRunTask extends JmeterAbstractTask {
             log.debug("JMeter is called with the following command line arguments: " + args.toString());
 
 
-            setCustomSecurityManager();
-
-            setCustomUncaughtExceptionHandler();
-
-            try {
-                JMeter jmeter = new JMeter();
-                jmeter.start(args.toArray(new String[]{}));
-                BufferedReader in = new BufferedReader(new FileReader(getJmeterLog()));
-                while (!checkForEndOfTest(in)) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-            } catch (ExitException ee) {
-                if (ee.getCode() != 0) {
-                    throw new GradleException("Test failed", ee);
-                }
-            } finally {
-                System.setSecurityManager(oldManager);
-                Thread.setDefaultUncaughtExceptionHandler(oldHandler);
-            }
+            JmeterSpecs specs = new JmeterSpecs();
+            specs.getSystemProperties().put("search_paths", System.getProperty("search_paths"));
+            specs.getSystemProperties().put("jmeter.home", getWorkDir().getAbsolutePath());
+            specs.getSystemProperties().put("saveservice_properties", System.getProperty("saveservice_properties"));
+            specs.getSystemProperties().put("upgrade_properties", System.getProperty("upgrade_properties"));
+            specs.getSystemProperties().put("log_file", System.getProperty("log_file"));
+            specs.getJmeterProperties().addAll(args);
+            specs.setMaxHeapSize(maxHeapSize);
+            new JMeterRunner().executeJmeterCommand(specs, getWorkDir().getAbsolutePath());
             return resultFile.getCanonicalPath();
-
-
         } catch (IOException e) {
             throw new GradleException("Can't execute test", e);
         }
-    }
-
-
-    private boolean checkForEndOfTest(BufferedReader in) {
-        boolean testEnded = false;
-        String testEndsLine = getTestEndsLine();
-        try {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (line.contains(testEndsLine)) {
-                    testEnded = true;
-                    break;
-                } else if (line.contains("Could not open")) {
-                    testEnded = true;
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            throw new GradleException("Can't read log file", e);
-        }
-        return testEnded;
-    }
-
-    private String getTestEndsLine() {
-        String [] version = getJmeterVersion().split("\\.");
-        String result = "Test has ended";
-        int major = Integer.valueOf(version[0]);
-        int minor = Integer.valueOf(version[1]);
-        if (major == 2) {
-            if (minor > 7) {
-                result = "Notifying test listeners of end of test";
-            }
-        } else if (major > 2) {
-            result = "Notifying test listeners of end of test";
-        }
-        return result;
     }
 
     private List<String> scanSourceFolder() {
@@ -377,5 +319,13 @@ public class JmeterRunTask extends JmeterAbstractTask {
 
     public void setReportXslt(File reportXslt) {
         this.reportXslt = reportXslt;
+    }
+
+    public String getMaxHeapSize() {
+        return maxHeapSize;
+    }
+
+    public void setMaxHeapSize(String maxHeapSize) {
+        this.maxHeapSize = maxHeapSize;
     }
 }

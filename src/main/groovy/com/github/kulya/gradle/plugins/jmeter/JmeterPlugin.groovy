@@ -1,11 +1,11 @@
-package com.github.kulya.gradle.plugins.jmeter;
+package com.github.kulya.gradle.plugins.jmeter
 
-import org.gradle.api.Action;
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
-import org.gradle.api.plugins.Convention;
+import org.gradle.api.Action
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.plugins.Convention
 
-import java.util.concurrent.Callable;
+import java.util.concurrent.Callable
 
 public class JmeterPlugin implements Plugin<Project> {
 
@@ -17,32 +17,28 @@ public class JmeterPlugin implements Plugin<Project> {
 
     public static final String PERFORMANCE_GROUP = "performance";
 
-    private JmeterRunGuiTask runGuiTask;
-
-    private JmeterRunTask runTask;
-
     public void apply(final Project project) {
         final JmeterPluginConvention jmeterConvention = new JmeterPluginConvention(project);
 
         Convention convention = project.getConvention();
         convention.getPlugins().put(JMETER_PLUGIN_NAME, jmeterConvention);
 
-        project.getTasks().withType(JmeterRunGuiTask.class, new Action<JmeterRunGuiTask>() {
+        JmeterRunGuiTask runGuiTask = project.getTasks().create(JMETER_RUN_GUI, JmeterRunGuiTask.class, new Action<JmeterRunGuiTask>() {
             @Override
             public void execute(JmeterRunGuiTask jmeterRunGuiTask) {
                 configureJmeterAbstractTask(project, jmeterConvention, jmeterRunGuiTask);
             }
         });
-        JmeterRunGuiTask runGuiTask = project.getTasks().add(JMETER_RUN_GUI, JmeterRunGuiTask.class);
         runGuiTask.setDescription("Start JMeter GUI");
         runGuiTask.setGroup(PERFORMANCE_GROUP);
 
-        project.getTasks().withType(JmeterRunTask.class, new Action<JmeterRunTask>() {
+        JmeterRunTask runTask = project.getTasks().create(JMETER_RUN, JmeterRunTask.class, new Action<JmeterRunTask>() {
+
+            @Override
             public void execute(JmeterRunTask jmeterRunTask) {
                 configureJmeterTask(project, jmeterConvention, jmeterRunTask);
             }
         });
-        JmeterRunTask runTask = project.getTasks().add(JMETER_RUN, JmeterRunTask.class);
         runTask.setDescription("Execute JMeter tests");
         runTask.setGroup(PERFORMANCE_GROUP);
     }
@@ -150,4 +146,5 @@ public class JmeterPlugin implements Plugin<Project> {
             }
         })
     }
+
 }
