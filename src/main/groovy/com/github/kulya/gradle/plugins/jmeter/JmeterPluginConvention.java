@@ -94,6 +94,17 @@ public class JmeterPluginConvention {
      */
     private String maxHeapSize = "512M";
 
+    /**
+     * Path to a Jmeter XML file which will be edited. This is for jmeterEditor task
+     * Relative to srcDir.
+     */
+    private File jmeterEditFile;
+
+    /**
+     * Paths to user properties files
+     */
+    private List<File> jmeterUserPropertiesFiles;
+
     public static final String JMETER_DEFAULT_PROPERTY_NAME = "jmeter.properties";
 
     public JmeterPluginConvention(Project project) {
@@ -220,6 +231,22 @@ public class JmeterPluginConvention {
 
     public void setMaxHeapSize(String maxHeapSize) {
         this.maxHeapSize = maxHeapSize;
+    }
+
+    public File getJmeterEditFile() {
+        return jmeterEditFile;
+    }
+
+    public void setJmeterEditFile(File jmeterEditFile) {
+        this.jmeterEditFile = jmeterEditFile;
+    }
+
+    public List<File> getJmeterUserPropertiesFiles() {
+        return jmeterUserPropertiesFiles;
+    }
+
+    public void setJmeterUserPropertiesFiles(List<File> jmeterUserPropertiesFiles) {
+        this.jmeterUserPropertiesFiles = jmeterUserPropertiesFiles;
     }
 }
 

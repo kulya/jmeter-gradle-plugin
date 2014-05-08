@@ -89,6 +89,8 @@ public class JmeterRunTask extends JmeterAbstractTask {
 
     private String maxHeapSize;
 
+    private List<File> jmeterUserPropertiesFiles;
+
     @Override
     protected void runTaskAction() throws IOException {
         List<String> testFiles = new ArrayList<String>();
@@ -203,6 +205,16 @@ public class JmeterRunTask extends JmeterAbstractTask {
                      "-p", getJmeterPropertyFile().getCanonicalPath()));
 
 
+            if(jmeterUserPropertiesFiles!=null)
+            {
+                for(File userPropertyFile: jmeterUserPropertiesFiles)
+                {
+                    if(userPropertyFile.exists() && userPropertyFile.isFile())
+                    {
+                        args.addAll(Arrays.asList("-S", userPropertyFile.getCanonicalPath()));
+                    }
+                }
+            }
             initUserProperties(args);
 
             if (remote) {
@@ -327,5 +339,13 @@ public class JmeterRunTask extends JmeterAbstractTask {
 
     public void setMaxHeapSize(String maxHeapSize) {
         this.maxHeapSize = maxHeapSize;
+    }
+
+    public List<File> getJmeterUserPropertiesFiles() {
+        return jmeterUserPropertiesFiles;
+    }
+
+    public void setJmeterUserPropertiesFiles(List<File> jmeterUserPropertiesFiles) {
+        this.jmeterUserPropertiesFiles = jmeterUserPropertiesFiles;
     }
 }

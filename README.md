@@ -40,6 +40,7 @@ If it is 1.3.1 and above
     }
 
 3) With this plugin you can specify next JMeter properties:
+
 * srcDir - Directory with JMeter test files if you want include them all without strict order [ $project.dir/src/test/jmeter by default ]
 * includes - JMeter files that you want to include at build
 * excludes - JMeter files that you want to exclude from build
@@ -53,6 +54,9 @@ If it is 1.3.1 and above
 * jmeterPropertyFile - alternate properties file to be used with the -p jmeter option [ srcDir/jmeter.properties by default ]
 * jmeterUserProperties - List of JMeter user properties
 * maxHeapSize - Max heap size for jmeter process by default set to 512M. Support any walue that -Xmx property support.
+* jmeterPluginJars - plugin Jars Files
+* jmeterEditFile - JMeter file that you want to edit. This is used for jmeterEditor Task
+* jmeterUserPropertiesFiles - List of user properties files
 
 4) To run JMeter test execute
     
@@ -65,3 +69,11 @@ At project directory
     gradle jmeterEditor
 
 At project directory
+
+6) To clean the reports
+
+    gradle jmeterCleanReport
+
+7) To List all the testPlan
+
+    gradle jmeterListTestPlan
