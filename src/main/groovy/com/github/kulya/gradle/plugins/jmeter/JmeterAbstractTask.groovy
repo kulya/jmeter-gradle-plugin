@@ -34,6 +34,8 @@ abstract class JmeterAbstractTask extends ConventionTask{
 
     private String maxHeapSize
 
+    private List<File> jmeterUserPropertiesFiles;
+
     @TaskAction
     public void start() {
         loadJMeterVersion();
@@ -225,5 +227,13 @@ abstract class JmeterAbstractTask extends ConventionTask{
 
     void setMaxHeapSize(String maxHeapSize) {
         this.maxHeapSize = maxHeapSize
+    }
+
+    public List<File> getJmeterUserPropertiesFiles() {
+        return jmeterUserPropertiesFiles;
+    }
+
+    public void setJmeterUserPropertiesFiles(List<File> jmeterUserPropertiesFiles) {
+        this.jmeterUserPropertiesFiles = jmeterUserPropertiesFiles;
     }
 }
