@@ -16,7 +16,7 @@ class JMeterRunner {
         Process p = processBuilder.start()
         int processResult = p.waitFor()
         if (processResult != 0) {
-            throw new GradleException("Something goes wrong when we execute jmeter test.... Please see jmeter logs for more information")
+            throw new GradleException("Something went wrong during jmeter test execution, Please see jmeter logs for more information")
         }
     }
 

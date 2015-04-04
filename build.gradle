@@ -28,7 +28,7 @@ task wrapper(type: Wrapper) {
 
 configurations {
 	//workaround for jmeter defect 57555 (https://bz.apache.org/bugzilla/show_bug.cgi?id=57555)
-	if (jmeterVersion == '2.13'){
+	if (jmeterVersion == '2.12'){
 		compile.exclude group: 'excalibur-fortress'
 	}
 	//workaround for jmeter defect 57748 (https://bz.apache.org/bugzilla/show_bug.cgi?id=57748)
@@ -60,7 +60,7 @@ dependencies {
 		"org.apache.jmeter:ApacheJMeter_components:${jmeterVersion}",
 		"org.apache.jmeter:ApacheJMeter_config:${jmeterVersion}",
 		"org.apache.jmeter:ApacheJMeter_core:${jmeterVersion}",
-		"org.apache.jmeter:ApacheJMeter_junit-test:${jmeterVersion}"
+		"org.apache.jmeter:ApacheJMeter_junit:${jmeterVersion}"
 		
 
 	//version specific dependencies
@@ -73,10 +73,9 @@ dependencies {
 	if (jmeterVersion < '2.13'){
 		compile	"org.apache.jmeter:ApacheJMeter_report:${jmeterVersion}"
 	}
-	if (jmeterVersion > '2.12'){
+	if (jmeterVersion > '2.9'){
 		compile	"org.apache.jmeter:ApacheJMeter_components:${jmeterVersion}",
 		"org.apache.jmeter:ApacheJMeter_config:${jmeterVersion}",
-		"org.apache.jmeter:ApacheJMeter_core:${jmeterVersion}",
 		"org.apache.jmeter:ApacheJMeter_junit-test:${jmeterVersion}",
 		"org.apache.jmeter:ApacheJMeter_mongodb:${jmeterVersion}"
 	}
