@@ -29,12 +29,14 @@ task wrapper(type: Wrapper) {
 configurations {
 	//workaround for jmeter defect 57555 (https://bz.apache.org/bugzilla/show_bug.cgi?id=57555)
 	if (jmeterVersion == '2.12'){
-		compile.exclude group: 'excalibur-fortress'
+		compile.exclude group: 'excalibur-fortress', module: 'excalibur-fortress-container-api'
+		compile.exclude group: 'excalibur-fortress', module: 'excalibur-fortress-meta'
+ 	
 	}
 	//workaround for jmeter defect 57748 (https://bz.apache.org/bugzilla/show_bug.cgi?id=57748)
 	if (jmeterVersion == '2.13'){
-		compile.exclude group: 'commons-math3'
-		compile.exclude group: 'commons-pool2'
+		compile.exclude group: 'commons-math3', module: 'commons-math3'
+		compile.exclude group: 'commons-pool2', module: 'commons-pool2'
 	}
 }
 
