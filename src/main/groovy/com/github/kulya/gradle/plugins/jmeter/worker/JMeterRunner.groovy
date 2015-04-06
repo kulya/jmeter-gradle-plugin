@@ -10,13 +10,13 @@ class JMeterRunner {
     private final static Logger LOGGER = Logging.getLogger(JMeterRunner.class)
 
     void executeJmeterCommand(JmeterSpecs specs, String workingDirectory) {
-        ProcessBuilder processBuilder = new ProcessBuilder(createArgumentList(specs, workingDirectory))
+        ProcessBuilder processBuilder = new ProcessBuilder(createArgumentList(specs, workingDirectory)).inheritIO()
         processBuilder.redirectErrorStream(true)
         processBuilder.directory(new File(workingDirectory))
         Process p = processBuilder.start()
         int processResult = p.waitFor()
         if (processResult != 0) {
-            throw new GradleException("Something goes wrong when we execute jmeter test.... Please see jmeter logs for more information")
+            throw new GradleException("Something went wrong during jmeter test execution, Please see jmeter logs for more information")
         }
     }
 
